@@ -1,8 +1,8 @@
 <template>
   <div>
-    <Titulo texto="Aluno"/>
+    <Titulo :texto="professorid != undefined ?  'Professor: ' + professor.nome : 'Todos os alunos' "/>
     
-    <div>
+    <div v-if="professorid != undefined">
       <input type="text" placeholder="Nome do Aluno" v-model="nome" v-on:keyup.enter="addAluno()">
       <button class="btn btnInput" @click="addAluno()">Adicionar</button>
     </div>
@@ -17,8 +17,13 @@
         
         <tr v-for="(aluno, index) in alunos" :key="index">
            <!-- <td>{{index+1}}</td> -->
-            <td>{{aluno.id}}</td>
-            <td>{{aluno.nome}} {{aluno.sobrenome}}</td>
+            <td class="colPequeno">{{aluno.id}}</td>
+            
+            <router-link v-bind:to="`/alunoDetalhe/${aluno.id}`" tag="td" style="cursor: pointer">
+                {{aluno.nome}} {{aluno.sobrenome}}
+            </router-link>
+
+
             <td><button class="btn btn_Danger" @click="remover(aluno)">Remover</button></td>
         </tr>
 
@@ -43,6 +48,8 @@ export default {
   data(){
     return {
       titulo: "Aluno",
+      professorid: this.$route.params.prof_id,
+      professor: {},
       nome: '',
       alunos: []
           //      {id: 1, nome:"Marcos", sobrenome: "Xavier"},
@@ -51,10 +58,21 @@ export default {
     }
   },
   created(){
-    this.$http
-      .get("http://localhost:3000/alunos")
-      .then(res => res.json())          /* converte de text para json */
-      .then(aln => this.alunos = aln)   /* o retorno em json é atribuido a this.alunos */
+
+    if (this.professorid){
+
+      this.carregarProfessor();
+
+      this.$http
+        .get("http://localhost:3000/alunos?professor.id="+this.professorid)
+        .then(res => res.json())          /* converte de text para json */
+        .then(aln => this.alunos = aln)   /* o retorno em json é atribuido a this.alunos */
+    } else {
+      this.$http
+        .get("http://localhost:3000/alunos")
+        .then(res => res.json())          /* converte de text para json */
+        .then(aln => this.alunos = aln)   /* o retorno em json é atribuido a this.alunos */
+    }
   },
   props: {
   },
@@ -64,7 +82,11 @@ export default {
 
       let _aluno = {
         nome: this.nome,
-        sobrenome: ""
+        sobrenome: "",
+        professor: {
+          id: this.professorid,
+          nome: this.professor.nome          
+        }
       }
 
       this.$http
@@ -74,8 +96,6 @@ export default {
         this.alunos.push(alunoRetornado);   
         this.nome = '';     
       })
-      
-             
     },
 
     remover(aluno){
@@ -86,9 +106,18 @@ export default {
           let indice = this.alunos.indexOf(aluno);
           this.alunos.splice(indice, 1);
       } ) 
+ 
+    },
 
-      
-    }
+    carregarProfessor(){
+      this.$http
+        .get("http://localhost:3000/professores/" + this.professorid)
+        .then(res => res.json())                          
+        .then(prof => {
+            this.professor = prof
+          }
+        )   
+    },    
   },
   
 }
@@ -97,6 +126,7 @@ export default {
 <style scoped>
 
 input {
+  width: calc(100% - 170px);
   border: 0;
   padding: 10px;
   font-size: 1.3em;
