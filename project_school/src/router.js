@@ -23,7 +23,7 @@ export default new Router({
         },
 
         {
-            path: "/todosalunos",
+            path: "/alunos",
             nome: "Alunos",
             component: Alunos
         },

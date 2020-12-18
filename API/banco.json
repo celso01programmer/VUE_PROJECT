@@ -36,8 +36,8 @@
     {
       "id": 3,
       "nome": "Beatriz",
-      "sobrenome": "Siqueira",
-      "dataNasc": "01/01/1998",
+      "sobrenome": "Siqueiras",
+      "dataNasc": "01/01/1997",
       "professor": {
         "id": 3,
         "nome": "Luana"
@@ -56,7 +56,7 @@
     {
       "id": 7,
       "nome": "Eliana",
-      "sobrenome": "Silva",
+      "sobrenome": "Silva Dias",
       "dataNasc": "10/02/2020",
       "professor": {
         "id": 2,

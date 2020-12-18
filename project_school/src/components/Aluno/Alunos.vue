@@ -29,7 +29,7 @@
 
       </tbody> 
       <tfoot v-else>
-          Nenhum aluno encontrado
+          Nenhum Aluno Encontrado
       </tfoot>
     </table>
   </div>

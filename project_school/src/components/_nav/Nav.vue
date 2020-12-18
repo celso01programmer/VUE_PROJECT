@@ -2,7 +2,7 @@
     <div class="barraTop">
         <nav class="marginPrincipal">
             <router-link to="/professores">Professores</router-link>
-            <router-link to="/todosalunos">Alunos</router-link>
+            <router-link to="/alunos">Alunos</router-link>
             <router-link to="/sobre">Sobre</router-link>
         </nav>            
     </div>
@@ -20,11 +20,7 @@
         background-color: rgb(230, 230, 230);
     }
 
-    .marginPrincipal{
-
-    }
-
-    nav {
+     nav {
         padding: 20px 20px 20px 0px;
     }
 
