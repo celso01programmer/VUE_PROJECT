@@ -51,6 +51,8 @@ namespace ProjectSchool_API
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "ProjectSchool_API", Version = "v1" });
             });
 
+            services.AddCors();
+
             services.AddScoped<IRepository, Repository>();
         }
 
@@ -71,6 +73,9 @@ namespace ProjectSchool_API
             app.UseHttpsRedirection();
             app.UseRouting();
             app.UseAuthorization();
+
+            //Deve vir antes da instrucao de uso do MVC (app.UseMvc())
+            app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 
             app.UseMvc();
 

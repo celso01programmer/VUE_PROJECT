@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Titulo texto="Professores"/>
+    <Titulo texto="Professores" btnVoltar="true"/>
     
     <table>
       <thead>
@@ -22,7 +22,9 @@
 
       </tbody> 
       <tfoot v-else>
-          Nenhum professor encontrado
+        <tr>
+            <td colspan="3" style="text-align: center"><h5>Nenhum professor encontrado</h5></td>
+        </tr>
       </tfoot>
     </table>
   </div>
@@ -46,7 +48,7 @@ export default {
     },
     created(){
       this.$http
-        .get("http://localhost:3000/alunos")
+        .get("http://localhost:5000/api/aluno")
         .then(res => res.json())                          
         .then( alunos => {
             this.Alunos = alunos,
@@ -61,7 +63,7 @@ export default {
   methods: {
     carregarProfessores(){
       this.$http
-        .get("http://localhost:3000/professores")
+        .get("http://localhost:5000/api/professor")
         .then(res => res.json())                          
         .then(prof => {
             this.Professores = prof

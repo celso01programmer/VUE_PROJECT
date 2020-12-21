@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div v-if="!loading">
         <Titulo :texto="`Aluno: ${aluno.nome}` " :btnVoltar="!visualizando">
             <button v-show="visualizando" class="btn btnEditar" @click="editar()">Editar</button>
         </Titulo>
@@ -71,23 +71,38 @@
                 aluno: {},
                 professores: [], 
                 idAluno: this.$route.params.id,
-                visualizando: true
+                visualizando: true,
+                loading: true
             }
         },
 
         created(){
-            this.$http
-                .get("http://localhost:3000/alunos/" + this.idAluno)
-                .then(res => res.json())            
-                .then(aluno => this.aluno = aluno);
-
-            this.$http
-                .get("http://localhost:3000/professores")
-                .then(res => res.json())                          
-                .then(professor => this.professores = professor);
+            this.carregarProfessor();
         },
 
         methods: {
+
+            carregarProfessor(){
+                this.$http
+                    .get("http://localhost:5000/api/professor")
+                    .then(res => res.json())                          
+                    .then(professor => {
+                        this.carregarAluno();
+                        this.professores = professor
+                    });
+
+            },
+
+            carregarAluno(){
+                this.$http
+                    .get("http://localhost:5000/api/aluno/" + this.idAluno)
+                    .then(res => res.json())            
+                    .then(aluno => {
+                        this.aluno = aluno;
+                        this.loading = false;
+                    });
+            },
+
             editar(){
                 this.visualizando = !this.visualizando;
             },
@@ -98,11 +113,15 @@
                         nome: _aluno.nome,
                         sobrenome: _aluno.sobrenome,
                         dataNasc: _aluno.dataNasc,
-                        professor: _aluno.professor
+                        professorid: _aluno.professor.id
                 }
 
                 this.$http
-                    .put(`http://localhost:3000/alunos/${_alunoEditar.id}`, _alunoEditar);
+                    .put(`http://localhost:5000/api/aluno/${_alunoEditar.id}`, _alunoEditar)
+                    .then(res => res.json())
+                    .then(res => this.aluno = res)
+                    .then(() => this.visualizando = true)
+
                     this.visualizando = !this.visualizando;
             },
 
