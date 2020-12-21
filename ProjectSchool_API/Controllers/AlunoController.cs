@@ -1,4 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
+using ProjectSchool_API.Data;
+using ProjectSchool_API.Models;
+using System.Threading.Tasks;
 
 namespace ProjectSchool_API.Controllers
 {
@@ -6,39 +10,121 @@ namespace ProjectSchool_API.Controllers
     [ApiController]
     public class AlunoController : Controller
     {
+        private IRepository _repository { get; }
 
-        public AlunoController()
+        public AlunoController(IRepository repository)
         {
+            this._repository = repository;
         }
 
         [HttpGet]
-        public IActionResult get()
+        public async Task<IActionResult> get()
         {
-            return Ok();
+            try
+            {
+                var result = await _repository.GetAllAlunosAsync(true);
+                return Ok(result);
+            }
+            catch (System.Exception)
+            {
+                return this.StatusCode(StatusCodes.Status500InternalServerError, "Falha no acesso ao banco de dados.");
+            }
         }
 
         [HttpGet("{AlunoId}")]
-        public IActionResult get(int AlunoId)
+        public async Task<IActionResult> getByAlunoId(int AlunoId)
         {
-            return Ok();
+            try
+            {
+                var result = await _repository.GetAlunoAsyncById(AlunoId, true);
+                return Ok(result);
+            }
+            catch (System.Exception)
+            {
+                return this.StatusCode(StatusCodes.Status500InternalServerError, "Falha no acesso ao banco de dados.");
+            }
         }
 
-        [HttpPost]
-        public IActionResult post()
+        [HttpGet("ByProfessorId/{ProfessorId}")]
+        public async Task<IActionResult> getByProfessorId(int ProfessorId)
         {
-            return Ok();
+            try
+            {
+                var result = await _repository.GetAlunosAsyncByProfessorId(ProfessorId, true);
+                return Ok(result);
+            }
+            catch (System.Exception)
+            {
+                return this.StatusCode(StatusCodes.Status500InternalServerError, "Falha no acesso ao banco de dados.");
+            }
         }
-        
-        [HttpPut("{AlunoId}")]
-        public IActionResult put(int AlunoId)
+
+
+
+        [HttpPost]
+        public async Task<IActionResult> post(Aluno model)
         {
-            return Ok();
+            try
+            {
+                _repository.Add(model);
+                
+                if (await _repository.SaveChangesAsync()){
+                    return Created($"/api/aluno/{model.Id}", model);
+                }
+                
+            }
+            catch (System.Exception)
+            {
+                return this.StatusCode(StatusCodes.Status500InternalServerError, "Falha no acesso ao banco de dados.");
+            }
+            return BadRequest();
+        }
+
+        [HttpPut("{AlunoId}")]
+        public async Task<IActionResult> put(int AlunoId, Aluno model)
+        {
+            try
+            {
+                var aluno = await _repository.GetAlunoAsyncById(AlunoId, false);
+                if (aluno == null){
+                    return NotFound();
+                }
+
+                _repository.Update(model);
+
+                if (await _repository.SaveChangesAsync()){
+                    aluno = await _repository.GetAlunoAsyncById(AlunoId, true);
+                    return Created($"/api/aluno/{model.Id}", aluno);
+                }
+            }
+            catch (System.Exception)
+            {
+                return this.StatusCode(StatusCodes.Status500InternalServerError, "Falha no acesso ao banco de dados.");
+            }
+            return BadRequest();
         }
 
         [HttpDelete("{AlunoId}")]
-        public IActionResult delete()
+        public async Task<IActionResult> delete(int AlunoId)
         {
-            return Ok();
+            try
+            {
+                var aluno = await _repository.GetAlunoAsyncById(AlunoId, false);
+                if (aluno == null){
+                    return NotFound();
+                }
+
+                _repository.Delete(aluno);
+
+                if (await _repository.SaveChangesAsync()){
+                    return Ok();
+                }
+            }
+            catch (System.Exception)
+            {
+                return this.StatusCode(StatusCodes.Status500InternalServerError, "Falha no acesso ao banco de dados.");
+            }
+            return BadRequest();
         }
     }
 }
